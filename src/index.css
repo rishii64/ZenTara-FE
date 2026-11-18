@@ -1,0 +1,179 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    color-scheme: light dark;
+  }
+  body {
+    font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #fdfbf7;
+    color: #1c1917;
+    transition-property: color, background-color, border-color;
+    transition-duration: 200ms;
+  }
+  html.dark body,
+  body.dark {
+    background-color: #0d0b0a;
+    color: #f5f5f4;
+  }
+}
+
+/* Material Textile Card Component Utility */
+@layer components {
+  .mat-card {
+    background-color: #ffffff;
+    border-radius: 1.5rem;
+    border-width: 1px;
+    border-color: rgba(241, 235, 217, 0.8);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+    transition-property: color, background-color, border-color;
+    transition-duration: 200ms;
+  }
+  html.dark .mat-card,
+  .dark .mat-card {
+    background-color: #151311;
+    border-color: #26221f;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.5), 0 1px 2px 0 rgba(0, 0, 0, 0.35);
+  }
+  .display-italic {
+    font-family: 'Fraunces', Georgia, serif;
+    font-style: italic;
+    font-variation-settings: "opsz" 144, "SOFT" 50;
+  }
+}
+
+/* Smooth Textile Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(194, 94, 46, 0.25);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(194, 94, 46, 0.45);
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Print Styles for POS Thermal Receipt (80mm) and Standard A4 Invoice */
+@media print {
+  /* Isolate receipt printing: when modal is active, hide everything in the root app */
+  body.receipt-modal-open #root {
+    display: none !important;
+  }
+
+  /* Universal hide for non-printable UI chrome */
+  .no-print,
+  .no-print * {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Clean print surface */
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Modal container resets when printing */
+  .receipt-modal-backdrop {
+    position: static !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    overflow: visible !important;
+  }
+
+  .receipt-modal-dialog {
+    position: static !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
+  .receipt-modal-canvas {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  /* Base printable receipt styles */
+  .printable-area {
+    display: block !important;
+    visibility: visible !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+    page-break-inside: avoid;
+  }
+
+  /* 80mm POS Thermal Receipt: exact 76mm printable roll width */
+  .printable-area.thermal-format {
+    width: 76mm !important;
+    max-width: 76mm !important;
+    margin: 0 auto !important;
+    padding: 2mm 3mm !important;
+    font-family: 'JetBrains Mono', 'Courier New', monospace !important;
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+  }
+
+  /* Standard A4 Tax Invoice: max-width 190mm fitting A4 printable area */
+  .printable-area.a4-format {
+    width: 100% !important;
+    max-width: 190mm !important;
+    margin: 0 auto !important;
+    padding: 6mm 8mm !important;
+    font-family: 'Manrope', system-ui, sans-serif !important;
+    font-size: 11px !important;
+  }
+
+  .printable-area table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  @page {
+    margin: 3mm;
+    size: auto;
+  }
+}
