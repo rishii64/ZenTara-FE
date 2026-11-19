@@ -1,9 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { api } from '../api';
+import { useAuth } from './AuthContext';
 
 const StoreContext = createContext();
 
 export function StoreProvider({ children }) {
+  const { user } = useAuth();
   const [storeSettings, setStoreSettings] = useState({
     store_name: 'ZENTARA',
     tagline: 'Premium Retail Garment & Fashion Flagship',
@@ -25,7 +27,7 @@ export function StoreProvider({ children }) {
         setStoreSettings(prev => ({ ...prev, ...data }));
       }
     } catch (err) {
-      console.warn('Could not load store settings:', err.message);
+      // Silently fall back to default store settings
     } finally {
       setLoading(false);
     }
@@ -33,7 +35,7 @@ export function StoreProvider({ children }) {
 
   useEffect(() => {
     loadSettings();
-  }, []);
+  }, [user]);
 
   const updateSettings = async (newSettings) => {
     await api.updateSettings(newSettings);
