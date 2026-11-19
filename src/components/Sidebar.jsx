@@ -21,13 +21,13 @@ import {
   X
 } from 'lucide-react';
 
-export default function Sidebar({ 
-  activePage, 
-  setActivePage, 
-  sidebarCollapsed, 
+export default function Sidebar({
+  activePage,
+  setActivePage,
+  sidebarCollapsed,
   setSidebarCollapsed,
   mobileMenuOpen,
-  setMobileMenuOpen 
+  setMobileMenuOpen
 }) {
   const { user, hasPermission } = useAuth();
   const { storeName } = useStore();
@@ -37,7 +37,7 @@ export default function Sidebar({
       title: 'OPERATIONS',
       items: [
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, module: 'dashboard' },
-        { id: 'pos', label: 'POS Billing Counter', icon: ShoppingCart, module: 'pos', primary: true },
+        { id: 'pos', label: 'POS Billing Counter', icon: ShoppingCart, module: 'pos' },
         { id: 'sales', label: 'Sales History', icon: Receipt, module: 'sales' },
         { id: 'returns', label: 'Returns & Exchanges', icon: RotateCcw, module: 'returns' }
       ]
@@ -73,16 +73,15 @@ export default function Sidebar({
   return (
     <>
       {/* Mobile Drawer Backdrop Overlay */}
-      <div 
-        className={`fixed inset-0 bg-stone-950/60 backdrop-blur-xs z-40 lg:hidden transition-opacity duration-300 ${
-          mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        }`}
+      <div
+        className={`fixed inset-0 bg-stone-950/60 backdrop-blur-xs z-40 lg:hidden transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
         onClick={() => setMobileMenuOpen && setMobileMenuOpen(false)}
         aria-hidden="true"
       />
 
       {/* Fixed Sidebar Aside */}
-      <aside 
+      <aside
         className={`bg-white dark:bg-ink-900 border-r border-ivory-300/80 dark:border-ink-800 transition-all duration-300 flex flex-col flex-shrink-0 z-50 no-print
           fixed inset-y-0 left-0 h-full lg:static lg:h-full
           ${mobileMenuOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'}
@@ -133,22 +132,19 @@ export default function Sidebar({
                       key={item.id}
                       onClick={() => handleNavClick(item.id)}
                       title={sidebarCollapsed && !mobileMenuOpen ? item.label : undefined}
-                      className={`w-full flex items-center rounded-xl text-xs font-semibold transition-all duration-200 group relative ${
-                        sidebarCollapsed && !mobileMenuOpen ? 'justify-center p-3' : 'space-x-3 px-3.5 py-2.5'
-                      } ${
-                        isActive
+                      className={`w-full flex items-center rounded-xl text-xs font-semibold transition-all duration-200 group relative ${sidebarCollapsed && !mobileMenuOpen ? 'justify-center p-3' : 'space-x-3 px-3.5 py-2.5'
+                        } ${isActive
                           ? item.primary
                             ? 'bg-gradient-to-r from-ember-700 to-saffron-600 text-white shadow-md shadow-ember-600/25 font-bold'
                             : 'bg-ember-50 dark:bg-ember-950/60 text-ember-700 dark:text-ember-300 font-bold border-l-4 border-ember-600'
                           : item.primary
-                          ? 'text-ember-700 dark:text-ember-300 bg-ember-50/50 hover:bg-ember-100/60 dark:bg-ember-950/30 dark:hover:bg-ember-950/50 border border-ember-200 dark:border-ember-800/40'
-                          : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white hover:bg-ivory-100 dark:hover:bg-ink-800'
-                      }`}
+                            ? 'text-ember-700 dark:text-ember-300 bg-ember-50/50 hover:bg-ember-100/60 dark:bg-ember-950/30 dark:hover:bg-ember-950/50 border border-ember-200 dark:border-ember-800/40'
+                            : 'text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white hover:bg-ivory-100 dark:hover:bg-ink-800'
+                        }`}
                     >
-                      <Icon className={`w-4 h-4 flex-shrink-0 transition-transform group-hover:scale-105 ${
-                        isActive && item.primary ? 'text-white' : ''
-                      }`} />
-                      
+                      <Icon className={`w-4 h-4 flex-shrink-0 transition-transform group-hover:scale-105 ${isActive && item.primary ? 'text-white' : ''
+                        }`} />
+
                       {(!sidebarCollapsed || mobileMenuOpen) && (
                         <span className="truncate">{item.label}</span>
                       )}

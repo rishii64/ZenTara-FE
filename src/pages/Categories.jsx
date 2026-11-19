@@ -6,15 +6,15 @@ import { Layers, Plus, Trash2, Edit2, ShieldAlert } from 'lucide-react';
 
 export default function Categories() {
   const { user } = useAuth();
-  
+
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [newCatName, setNewCatName] = useState('');
   const [newCatDesc, setNewCatDesc] = useState('');
   const [newBrandName, setNewBrandName] = useState('');
-  
+
   const [catError, setCatError] = useState('');
   const [brandError, setBrandError] = useState('');
 
@@ -94,7 +94,7 @@ export default function Categories() {
 
   return (
     <div className="space-y-6">
-      
+
       {/* Header */}
       <div className="bg-white dark:bg-ink-900 p-6 sm:p-7 rounded-3xl border border-stone-200/90 dark:border-ink-800 shadow-mat-1 dark:shadow-mat-dark-1 transition-colors">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 dark:text-white tracking-tight flex items-center space-x-2 font-display">
@@ -107,7 +107,61 @@ export default function Categories() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
+
+        {/* Brands Section */}
+        <div className="bg-white dark:bg-ink-900 rounded-3xl border border-stone-200/90 dark:border-ink-800 shadow-mat-1 dark:shadow-mat-dark-1 p-6 space-y-4 transition-colors">
+          <h3 className="font-bold text-sm text-stone-900 dark:text-white border-b border-stone-100 dark:border-ink-800 pb-2 font-display">
+            Fashion Brands ({brands.length})
+          </h3>
+
+          {canManage && (
+            <form onSubmit={handleAddBrand} className="space-y-3 bg-ivory-50 dark:bg-ink-850 p-4 rounded-2xl border border-stone-200/80 dark:border-ink-700">
+              <div className="text-xs font-bold text-stone-800 dark:text-stone-200">Add New Brand</div>
+              {brandError && <div className="text-xs text-rose-500">{brandError}</div>}
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  required
+                  value={newBrandName}
+                  onChange={(e) => setNewBrandName(e.target.value)}
+                  placeholder="Brand Name (e.g. Raymond, Levi's)"
+                  className="flex-1 px-3 py-2 bg-white dark:bg-ink-900 border border-stone-300 dark:border-ink-700 rounded-xl text-xs text-stone-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-ember-500/30"
+                />
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-ember-600 hover:bg-ember-700 text-white rounded-xl text-xs font-bold transition flex items-center space-x-1 shadow-xs"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Save Brand</span>
+                </button>
+              </div>
+            </form>
+          )}
+
+          <div className="divide-y divide-stone-100 dark:divide-ink-800">
+            {brands.map((b) => (
+              <div key={b.id} className="py-3 flex items-center justify-between text-xs">
+                <div className="font-bold text-stone-900 dark:text-white">{b.name}</div>
+                <div className="flex items-center space-x-3">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-ivory-100 dark:bg-ink-800 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-ink-700">
+                    {b.product_count} products
+                  </span>
+                  {user?.role === 'Admin' && (
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteBrand(b.id, b.name)}
+                      className="p-1 text-stone-400 hover:text-rose-500 transition"
+                      title="Delete brand"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Categories Section */}
         <div className="bg-white dark:bg-ink-900 rounded-3xl border border-stone-200/90 dark:border-ink-800 shadow-mat-1 dark:shadow-mat-dark-1 p-6 space-y-4 transition-colors">
           <h3 className="font-bold text-sm text-stone-900 dark:text-white border-b border-stone-100 dark:border-ink-800 pb-2 font-display">
@@ -171,61 +225,7 @@ export default function Categories() {
             ))}
           </div>
         </div>
-
-        {/* Brands Section */}
-        <div className="bg-white dark:bg-ink-900 rounded-3xl border border-stone-200/90 dark:border-ink-800 shadow-mat-1 dark:shadow-mat-dark-1 p-6 space-y-4 transition-colors">
-          <h3 className="font-bold text-sm text-stone-900 dark:text-white border-b border-stone-100 dark:border-ink-800 pb-2 font-display">
-            Fashion Brands ({brands.length})
-          </h3>
-
-          {canManage && (
-            <form onSubmit={handleAddBrand} className="space-y-3 bg-ivory-50 dark:bg-ink-850 p-4 rounded-2xl border border-stone-200/80 dark:border-ink-700">
-              <div className="text-xs font-bold text-stone-800 dark:text-stone-200">Add New Brand</div>
-              {brandError && <div className="text-xs text-rose-500">{brandError}</div>}
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  required
-                  value={newBrandName}
-                  onChange={(e) => setNewBrandName(e.target.value)}
-                  placeholder="Brand Name (e.g. Raymond, Levi's)"
-                  className="flex-1 px-3 py-2 bg-white dark:bg-ink-900 border border-stone-300 dark:border-ink-700 rounded-xl text-xs text-stone-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-ember-500/30"
-                />
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-ember-600 hover:bg-ember-700 text-white rounded-xl text-xs font-bold transition flex items-center space-x-1 shadow-xs"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Save Brand</span>
-                </button>
-              </div>
-            </form>
-          )}
-
-          <div className="divide-y divide-stone-100 dark:divide-ink-800">
-            {brands.map((b) => (
-              <div key={b.id} className="py-3 flex items-center justify-between text-xs">
-                <div className="font-bold text-stone-900 dark:text-white">{b.name}</div>
-                <div className="flex items-center space-x-3">
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-ivory-100 dark:bg-ink-800 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-ink-700">
-                    {b.product_count} products
-                  </span>
-                  {user?.role === 'Admin' && (
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteBrand(b.id, b.name)}
-                      className="p-1 text-stone-400 hover:text-rose-500 transition"
-                      title="Delete brand"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
+        
       </div>
 
     </div>

@@ -411,19 +411,19 @@ export default function Dashboard({ setActivePage }) {
                     </td>
                     <td className="py-3 px-3">
                       <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-stone-100 dark:bg-ink-800 text-stone-700 dark:text-stone-300 border border-stone-200 dark:border-ink-700">
-                        {sale.payment_mode}
+                        {sale.payment_method || sale.payment_mode || 'Cash'}
                       </span>
                     </td>
                     <td className="py-3 px-3 text-right font-black font-mono text-stone-900 dark:text-white">
-                      ₹{sale.net_amount?.toFixed(2)}
+                      ₹{Number(sale.net_amount ?? sale.rounded_amount ?? sale.total_amount ?? 0).toFixed(2)}
                     </td>
                     <td className="py-3 px-3 text-center">
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                        sale.status === 'completed'
+                        (sale.status || 'completed') === 'completed'
                           ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
                           : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800'
                       }`}>
-                        {sale.status}
+                        {(sale.status || 'completed') === 'completed' ? 'Paid' : (sale.status || 'Voided')}
                       </span>
                     </td>
                     <td className="py-3 px-3 text-center">
@@ -446,7 +446,11 @@ export default function Dashboard({ setActivePage }) {
 
       {/* Modal Thermal Receipt Preview */}
       {selectedSale && (
-        <ThermalReceipt sale={selectedSale} onClose={() => setSelectedSale(null)} />
+        <ThermalReceipt
+          saleData={selectedSale}
+          sale={selectedSale?.sale || selectedSale}
+          onClose={() => setSelectedSale(null)}
+        />
       )}
 
     </div>

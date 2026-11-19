@@ -1,14 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Printer, X, CheckCircle2, Receipt, FileText } from 'lucide-react';
+import { useStore } from '../context/StoreContext';
 
 export default function ThermalReceipt({ saleData, sale: directSale, onClose }) {
   const [format, setFormat] = useState('thermal'); // 'thermal' (80mm) or 'a4'
   const [mounted, setMounted] = useState(false);
 
-  // Normalize sale object from props
-  const sale = saleData?.sale || directSale || saleData;
-  const store = saleData?.store || {};
+  let contextStore = {};
+  try {
+    const storeCtx = useStore();
+    contextStore = storeCtx?.storeSettings || {};
+  } catch (e) {
+    // If rendered outside StoreProvider
+  }
+
+  // Normalize sale object from props (handles { sale, store } wrappers, direct sale, or raw data)
+  const rawData = saleData || directSale || {};
+  const sale = rawData.sale || (rawData.invoice_number ? rawData : directSale?.sale || directSale || {});
+  const passedStore = rawData.store || saleData?.store || directSale?.store || {};
+  const store = { ...contextStore, ...passedStore };
 
   useEffect(() => {
     setMounted(true);
@@ -147,7 +158,7 @@ export default function ThermalReceipt({ saleData, sale: directSale, onClose }) 
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-600">Customer:</span>
-                  <span className="font-semibold text-slate-900">{sale.customer_name || 'Walk-in Customer'} {sale.customer_phone ? `(${sale.customer_phone})` : ''}</span>
+                  <span className="font-semibold text-slate-900">{sale.customer_name?.trim() ? sale.customer_name : 'Walk-in Customer'} {sale.customer_phone ? `(${sale.customer_phone})` : ''}</span>
                 </div>
               </div>
 
@@ -223,9 +234,9 @@ export default function ThermalReceipt({ saleData, sale: directSale, onClose }) 
               <div className="py-2 border-b border-dashed border-slate-400 text-[10px] space-y-0.5">
                 <div className="flex justify-between font-bold text-slate-900">
                   <span>Payment Mode:</span>
-                  <span className="uppercase">{sale.payment_method}</span>
+                  <span className="uppercase">{sale.payment_method || sale.payment_mode || 'Cash'}</span>
                 </div>
-                {sale.payment_method === 'Cash' && (
+                {(sale.payment_method === 'Cash' || sale.payment_mode === 'Cash') && Number(sale.cash_tendered) > 0 && (
                   <>
                     <div className="flex justify-between text-slate-700">
                       <span>Cash Tendered:</span>
@@ -281,12 +292,12 @@ export default function ThermalReceipt({ saleData, sale: directSale, onClose }) 
               <div className="grid grid-cols-2 gap-4 py-3 border-b border-slate-200 text-xs">
                 <div>
                   <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Billed To</div>
-                  <div className="font-bold text-slate-800 text-sm mt-0.5">{sale.customer_name || 'Walk-in Customer'}</div>
+                  <div className="font-bold text-slate-800 text-sm mt-0.5">{sale.customer_name?.trim() ? sale.customer_name : 'Walk-in Customer'}</div>
                   {sale.customer_phone && <div className="text-slate-600">Ph: {sale.customer_phone}</div>}
                 </div>
                 <div className="text-right">
                   <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Payment Details</div>
-                  <div className="font-bold text-slate-800 mt-0.5">Mode: {sale.payment_method}</div>
+                  <div className="font-bold text-slate-800 mt-0.5">Mode: {sale.payment_method || sale.payment_mode || 'Cash'}</div>
                   <div className="text-slate-600">Cashier: {sale.cashier_name || 'Admin'}</div>
                 </div>
               </div>

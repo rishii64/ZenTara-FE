@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../api';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -48,6 +48,7 @@ export default function Returns() {
   // Processing state
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(null);
+  const isSubmittingRef = useRef(false);
 
   // History Tab state
   const [returnsHistory, setReturnsHistory] = useState([]);
@@ -167,6 +168,8 @@ export default function Returns() {
   };
 
   const handleProcessSubmit = async () => {
+    if (isSubmittingRef.current || submitLoading) return;
+
     const itemsToReturn = [];
     saleItems.forEach(item => {
       const sel = returnSelections[item.id];
@@ -190,6 +193,7 @@ export default function Returns() {
       return;
     }
 
+    isSubmittingRef.current = true;
     setSubmitLoading(true);
     try {
       const payload = {
@@ -202,19 +206,32 @@ export default function Returns() {
       };
 
       const result = await api.processReturn(payload);
-      setSubmitSuccess(result);
-      toast.success(
-        `Return #${result.return_number} finalized (${result.type.toUpperCase()})`,
-        'Return Processed'
-      );
+      const returnData = result?.return || result;
+      const retNumber = returnData?.return_number || result?.return_number || 'Processed';
+      const retType = returnData?.type || result?.type || returnType || 'refund';
+
+      // Immediately clear the verified sale form so no secondary submit can occur
       setVerifiedSale(null);
       setSaleItems([]);
       setReturnSelections({});
       setExchangeItems([]);
+      setNotes('');
+      setInvoiceNumberInput('');
+
+      setSubmitSuccess({
+        message: result?.message || `${retType === 'exchange' ? 'Exchange' : 'Return'} processed successfully.`,
+        return: returnData
+      });
+
+      toast.success(
+        `Return #${retNumber} finalized (${retType.toUpperCase()})`,
+        'Return Processed'
+      );
     } catch (err) {
       const msg = err.message || 'Failed to process return';
       toast.error(msg, 'Return Error');
     } finally {
+      isSubmittingRef.current = false;
       setSubmitLoading(false);
     }
   };
@@ -304,19 +321,27 @@ export default function Returns() {
 
           {/* Success Banner */}
           {submitSuccess && (
-            <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 p-6 rounded-3xl space-y-2">
-              <div className="flex items-center space-x-3 text-emerald-800 dark:text-emerald-300">
-                <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+            <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 p-6 rounded-3xl space-y-2 flex items-start justify-between">
+              <div className="flex items-start space-x-3 text-emerald-800 dark:text-emerald-300">
+                <CheckCircle2 className="w-6 h-6 text-emerald-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-extrabold text-sm">{submitSuccess.message}</h3>
-                  <p className="text-xs text-emerald-700 dark:text-emerald-400">
-                    Return Reference: <strong className="font-mono">{submitSuccess.return?.return_number}</strong>
+                  <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-1">
+                    Return Reference: <strong className="font-mono">{submitSuccess.return?.return_number || submitSuccess.return_number}</strong>
+                  </p>
+                  <p className="text-xs text-emerald-800 dark:text-emerald-300 mt-1">
+                    Stock has been updated automatically. Saleable units restocked; damaged units logged separately.
                   </p>
                 </div>
               </div>
-              <div className="text-xs text-emerald-800 dark:text-emerald-300">
-                Stock has been updated automatically. Saleable units restocked; damaged units logged separately.
-              </div>
+              <button
+                type="button"
+                onClick={() => setSubmitSuccess(null)}
+                className="p-1 rounded-lg text-emerald-700 hover:bg-emerald-100 dark:text-emerald-300 dark:hover:bg-emerald-900/50 transition"
+                title="Dismiss"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
           )}
 
